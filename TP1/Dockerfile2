@@ -1,14 +1,14 @@
-FROM node:14-slim AS builder
+FROM node:14 AS builder
+
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
 RUN npx tsc
 
-FROM node:14-slim AS execution
+FROM node:14-alpine
 WORKDIR /app
-COPY --from=build /app/build ./build
-COPY --from=build /app/package.json .
-RUN adduser hugo
+COPY --from=builder /app .
+RUN adduser -D hugo
 USER hugo
 CMD node ./build/index.js
